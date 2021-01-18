@@ -2,16 +2,58 @@ const theScore = document.getElementById('the-score')
 const theLevel = document.getElementById('the-level')
 const nextPiece = Array.from(document.getElementsByClassName('next-piece'))
 
+const sounds = {
+  collect: new Audio('sounds/collect.wav'),
+  line: new Audio('sounds/line.wav'),
+  end: new Audio('sounds/end.wav'),
+  m1: new Audio('sounds/1.wav'),
+  m2: new Audio('sounds/2.wav'),
+  m3: new Audio('sounds/3.wav'),
+  moveSound(){
+    const arr = [this.m1, this.m2, this.m3]
+    this.m1.currentTime = 0
+    this.m2.currentTime = 0
+    this.m3.currentTime = 0
+    arr[Math.floor(Math.random() * arr.length)].play()
+  }
+}
+
+function startGame(){
+  for (let i = 3; i < 23; i++){
+    for (let j = 3; j < 12; j++){
+      board[i][j] = 0
+    }
+  }
+  clearInterval(intervalId)
+  gameState.isRunning = true
+  sounds.end.play()
+  point.reset()
+  gameState.score = 0
+  gameState.level = 1
+  theScore.innerHTML = 'SCORE: 0'
+  theLevel.innerHTML = 'LEVEL: 1'
+  pieces.setCurrentPiece()
+  initializePiece(point.get())
+  timedEvent(gameState.levelSpeed)
+  drawBoard()
+}
+
+const startButton = document.getElementById('start-button')
+startButton.addEventListener('click', () => {
+  startButton.innerHTML = 'RESTART' // only displays start when the game is over
+  startGame()
+})
+
 const gameState = {
   score: 0,
   level: 1,
   levelSpeed: 650,
-  isRunning: true,
+  isRunning: false,
   scoreUp(){
     this.score++
     if (this.score % 10 === 0){
       this.level++
-      this.levelSpeed -= 50
+      if (this.levelSpeed >= 50) this.levelSpeed -= 50
       clearInterval(intervalId)
       timedEvent(this.levelSpeed)
     }
@@ -28,43 +70,15 @@ function timedEvent(time){
     drawBoard()
     for (let i = 3; i <= 12; i++){ // check, doesn't seem to work 100%
       if (board[3][i] === 1){
+        gameState.isRunning = false
         clearInterval(intervalId)
         alert('Game over! You scored ' + gameState.score)
-        gameState.isRunning = false
+        startButton.innerHTML = 'START'
         return
       }
     }
   }, time)
 }
-
-const cleanBoard = [
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], // obscured from user // 15
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], // obscured from user
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], // obscured from user
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], 
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], 
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], // 10
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] // 25
-]  
 
 let board = [
   [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
@@ -93,7 +107,9 @@ let board = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-]  
+]
+
+const cleanBoard = board
 
 const pieces = {
   currentPiece: [],
@@ -256,7 +272,6 @@ function moveLeft(){
   } else {
     const newLocation = [(point.x - 1), point.y]
     initializePiece(newLocation)
-    console.log('moving left')
     point.set(newLocation)
     clearBoard()
     initializePiece(newLocation)
@@ -270,7 +285,6 @@ function moveRight(){
   } else {
     const newLocation = [(point.x + 1), point.y]
     initializePiece(newLocation)
-    console.log('moving right')
     point.set(newLocation)
     clearBoard()
     initializePiece(newLocation)
@@ -280,7 +294,7 @@ function moveRight(){
 
 // key handling
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'p'){
+  if (e.key === 'p'){ // bug - if you press after the game has finished, it increments the score
     gameState.isRunning = !gameState.isRunning
     if (!gameState.isRunning){
       clearInterval(intervalId)
@@ -290,6 +304,7 @@ document.addEventListener('keydown', (e) => {
     }
   }
   if (!gameState.isRunning) return
+  sounds.moveSound()
   if (e.key === 'w'){
     if (pieces.currentPiece !== pieces.O) moveRotation()
   } else if (e.key === 'a'){
@@ -318,6 +333,7 @@ function checkCollision(area){
           fixAllBlocks() // changes 8 to 1
           pieces.setCurrentPiece() // loads new piece
           gameState.scoreUp()
+          sounds.collect.play()
           return true
         }
       }
@@ -421,6 +437,8 @@ function checkLine(){
       gameState.scoreUp()
       clearBoard()
       drawBoard()
+      // sounds.line.currentTime = 0
+      sounds.line.play()
     }
   }
 }
@@ -435,14 +453,10 @@ function drawBoard(){
       } else if (board[i][j] === 0){
         divs[i - 3].children[j - 3].style.backgroundColor = 'rgb(158, 241, 241)'
       } 
-      // divs[i].children[j].innerHTML = board[i][j]
     }
   }
 }
 
-// init piece on the board at the start
-pieces.setCurrentPiece()
-initializePiece(point.get())
-timedEvent(gameState.levelSpeed)
+// init board
 drawBoard()
 
