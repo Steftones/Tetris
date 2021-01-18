@@ -1,15 +1,40 @@
 const theScore = document.getElementById('the-score')
-const nextPiece = document.getElementById('next-piece')
+const theLevel = document.getElementById('the-level')
+const nextPiece = Array.from(document.getElementsByClassName('next-piece'))
 
 const gameState = {
   score: 0,
   level: 1,
+  levelSpeed: 650,
+  isRunning: true,
   scoreUp(){
     this.score++
+    if (this.score % 10 === 0){
+      this.level++
+      this.levelSpeed -= 50
+      clearInterval(intervalId)
+      timedEvent(this.levelSpeed)
+    }
     theScore.innerHTML = `SCORE: ${this.score}`
-    this.level -= 0.1
-    //timedEvent() // but need to clear the interval of the last one. Doesn't work properly
+    theLevel.innerHTML = `LEVEL: ${this.level}`
   }
+}
+
+let intervalId
+function timedEvent(time){
+  console.log('timer started')
+  intervalId = setInterval(() => {
+    moveDown()
+    drawBoard()
+    for (let i = 3; i <= 12; i++){ // check, doesn't seem to work 100%
+      if (board[3][i] === 1){
+        clearInterval(intervalId)
+        alert('Game over! You scored ' + gameState.score)
+        gameState.isRunning = false
+        return
+      }
+    }
+  }, time)
 }
 
 const cleanBoard = [
@@ -71,11 +96,7 @@ let board = [
 ]  
 
 const pieces = {
-  currentPiece: [
-    [0,0,0],
-    [8,8,0],
-    [0,8,8]
-  ],
+  currentPiece: [],
   J: [
     [0,0,0],
     [8,0,0],
@@ -102,8 +123,9 @@ const pieces = {
     [8,8,0]
   ],
   O: [
-    [8,8], // BUG WITH THIS. TOO SMALL.
-    [8,8]
+    [0,0,0],
+    [8,8,0],
+    [8,8,0]
   ],
   I: [
     [0,0,0,0],
@@ -112,16 +134,36 @@ const pieces = {
     [0,0,0,0]
   ],
   random: [],
+  randomPieces(){
+    const arr = ['J', 'L', 'T', 'Z', 'S', 'O', 'I'].sort(() => Math.random() - 0.5)
+    return arr
+  },
+  drawNextPiece(){
+    const nextPieceLetter = this.random[this.random.length - 1]
+    const arr = this[`${nextPieceLetter}`]
+    // reset divs - make them all white
+    nextPiece.forEach((e) => {
+      Array.from(e.children).forEach(e => e.style.backgroundColor = '')
+    })
+    for (let i = 1; i < arr.length; i++){
+      for (let j = 0; j < arr[0].length; j++){
+        if (arr[i][j] === 8) nextPiece[i].children[j].style.backgroundColor = 'red'
+      }
+    }
+  },
   setCurrentPiece(){
-    if (this.random.length === 0){
-      this.random = ['J', 'L', 'T', 'Z', 'S', 'O', 'I'].sort(() => Math.random() - 0.5)
-    } 
+    if (this.random.length === 0) this.random = this.randomPieces()
     const piece = this.random.pop()
     this.currentPiece = this[`${piece}`]
     clearBoard()
     drawBoard()
     initializePiece(point.get())
-    nextPiece.innerHTML = this.random[this.random.length - 1] // displays next piece
+    // nextPiece.innerHTML = this.random[this.random.length - 1]
+    this.drawNextPiece()
+    if (this.random.length === 1){
+      const concatArr = this.randomPieces()
+      this.random = concatArr.concat(this.random)
+    }
   }
 }
 
@@ -143,11 +185,9 @@ const point = {
 console.log(point.get())
 
 function initializePiece(location){
-  // get location
   const x = location[0]
   const y = location[1]
   
-  // number of rows in the current piece array
   const rows = pieces.currentPiece.length - 1
   for (let i = rows, j = 0; (i >= 0) && (j <= rows); i--, j++){
     for (let k = 0; k < rows + 1; k++){
@@ -156,7 +196,6 @@ function initializePiece(location){
       }
     }
   }
-  return board //
 }
 
 // removes everything other than 1s
@@ -172,9 +211,7 @@ function clearBoard(){
     }
   }
   board = newBoard
-  return board //
 }
-
 
 function rotatePiece(){
   const newPiece = [[],[],[]]
@@ -213,48 +250,46 @@ function moveDown(){
   }
 }
 
-
 function moveLeft(){
-  if (checkCollision('pre-left')){
+  if (checkCollision('left')){
     return
   } else {
-    const previousLocation = point.get()
     const newLocation = [(point.x - 1), point.y]
     initializePiece(newLocation)
-    if (checkCollision('left')){
-      initializePiece(previousLocation)
-    } else {
-      console.log('moving left')
-      point.set(newLocation)
-      clearBoard()
-      initializePiece(newLocation)
-      drawBoard()
-    }
+    console.log('moving left')
+    point.set(newLocation)
+    clearBoard()
+    initializePiece(newLocation)
+    drawBoard()
   }
 }
 
 function moveRight(){
-  if (checkCollision('pre-right')){
+  if (checkCollision('right')){
     return
   } else {
-    const previousLocation = point.get()
     const newLocation = [(point.x + 1), point.y]
     initializePiece(newLocation)
-    if (checkCollision('right')){
-      initializePiece(previousLocation)
-    } else {
-      console.log('moving right')
-      point.set(newLocation)
-      clearBoard()
-      initializePiece(newLocation)
-      drawBoard()
-    }
+    console.log('moving right')
+    point.set(newLocation)
+    clearBoard()
+    initializePiece(newLocation)
+    drawBoard()
   }
 }
 
 // key handling
 document.addEventListener('keydown', (e) => {
-  drawBoard() // draw board every time
+  if (e.key === 'p'){
+    gameState.isRunning = !gameState.isRunning
+    if (!gameState.isRunning){
+      clearInterval(intervalId)
+    } else {
+      clearInterval(intervalId)
+      timedEvent(gameState.levelSpeed)
+    }
+  }
+  if (!gameState.isRunning) return
   if (e.key === 'w'){
     if (pieces.currentPiece !== pieces.O) moveRotation()
   } else if (e.key === 'a'){
@@ -282,11 +317,12 @@ function checkCollision(area){
           console.log('block below collision')
           fixAllBlocks() // changes 8 to 1
           pieces.setCurrentPiece() // loads new piece
+          gameState.scoreUp()
           return true
         }
       }
     }
-  } else if (area === 'pre-left') {
+  } else if (area === 'left') {
     for (let i = 0; i < board.length; i++){
       for (let j = 0; j < board[0].length; j++){
         if (board[i][j] === 8){
@@ -297,7 +333,7 @@ function checkCollision(area){
         }
       }
     }
-  } else if (area === 'pre-right') {
+  } else if (area === 'right') {
     for (let i = 0; i < board.length; i++){
       for (let j = 0; j < board[0].length; j++){
         if (board[i][j] === 8){
@@ -373,7 +409,6 @@ function fixAllBlocks(){
   checkLine()
   clearBoard()
   point.reset()
-  //clearBoard()   // WHY DECLARE TWICE?
   initializePiece(point.get())
   drawBoard()
 }
@@ -384,40 +419,30 @@ function checkLine(){
       board.splice(i,1)
       board.splice(3,0,[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1])
       gameState.scoreUp()
+      clearBoard()
+      drawBoard()
     }
   }
 }
 
-function timedEvent(){
-  console.log('timer started')
-  const blockMovement = setInterval(() => {
-    moveDown()
-    drawBoard()
-    for (let i = 3; i <= 12; i++){
-      if (board[3][i] === 1){
-        clearInterval(blockMovement)
-        alert('Game over bozo') // bug - when there's a piece stuck there it doesn't work properly
-      }
-    }
-  },gameState.level * 800)
-}
 
 const divs = document.getElementsByClassName('inputdiv')
-const divs2 = document.getElementsByClassName('inputdiv2')
 function drawBoard(){
   for (let i = 3; i < board.length - 3; i++){
-    for (let j = 0; j <= 15; j++){
-      if (board[i][j] === 8){
-        divs[i].children[j].style.backgroundColor = 'red'
+    for (let j = 3; j <= 12; j++){
+      if (board[i][j] === 8 || board[i][j] === 1){
+        divs[i - 3].children[j - 3].style.backgroundColor = 'red'
       } else if (board[i][j] === 0){
-        divs[i].children[j].style.backgroundColor = 'cyan'
+        divs[i - 3].children[j - 3].style.backgroundColor = 'rgb(158, 241, 241)'
       } 
+      // divs[i].children[j].innerHTML = board[i][j]
     }
   }
 }
 
 // init piece on the board at the start
 pieces.setCurrentPiece()
-timedEvent()
-drawBoard(board)
+initializePiece(point.get())
+timedEvent(gameState.levelSpeed)
+drawBoard()
 
