@@ -123,8 +123,9 @@ function timedEvent(time){
   intervalId = setInterval(() => {
     moveDown()
     drawBoard()
-    for (let i = 3; i <= 12; i++){ // check, doesn't seem to work 100%
-      if (board[3][i] === 1){
+    console.log(board[3])
+    for (let i = 3; i <= 12; i++){
+      if (board[4][i] === 1){
         setHighScore()
         sounds.end.play()
         gameState.isRunning = false
