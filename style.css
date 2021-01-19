@@ -9,21 +9,46 @@
 body {
   background-color: rgb(248, 255, 255);
   color: black;
+  font-family: 'Roboto', sans-serif;
+}
+
+#main-item {
+  display: inline-block;
+  align-items: center;
+  background-color: rgb(176, 203, 214);
+  margin: 5px;
+  border: none;
+  border-radius: 30px;
+  -webkit-box-shadow: inset 0px -2px 5px rgb(255, 255, 255);
+  -moz-box-shadow: inset 0px -2px 5px rgb(255, 255, 255);
+  box-shadow: inset 0px -2px 5px rgb(255, 255, 255);
 }
 
 #board-container {
   display: flex;
-  justify-content: center;
+  margin: 15px;
 }
 
-#board-container > div {
-  margin: 6px;
+#the-board {
+  background-color: rgb(182, 214, 226);
+  padding: 3px;
+  -webkit-box-shadow: inset 0px 0px 5px rgb(107, 107, 107);
+  -moz-box-shadow: inset 0px 0px 5px rgb(107, 107, 107);
+  box-shadow: inset 0px 0px 5px rgb(107, 107, 107);
 }
 
 .inputdiv2 {
   width: 15px;
   height: 15px;
   display: inline-block;
+}
+
+#stats {
+  padding: 15px;
+}
+
+#controls-container {
+  display: flex;
 }
 
 .inputdiv2:active {
@@ -42,22 +67,38 @@ body {
 }
 
 #controls-container {
-  display: flex;
-  justify-content: center;
+  display: inline-flex;
+  align-items: center;
 }
 
-.button {
+#button-container {
+  margin: 20px;
+}
+
+.start, .pause {
+  padding: 0px;
+  margin: 0px;
+  width: 60px;
+  height: 30px;
+  border-radius: 20px;
+  font-size: 10px;
+}
+
+.control {
   width: 30px;
   height: 30px;
   margin: 3px;
   text-align: center;
   display: inline-block;
   background-color: #99d49b;
-  border: none;
   border-radius: 100%;
+}
+
+.button {
   -webkit-box-shadow: inset 0px -2px 5px #333;
   -moz-box-shadow: inset 0px -2px 5px #333;
   box-shadow: inset 0px -2px 5px #333;
+  border: none;
 }
 
 .button:active {

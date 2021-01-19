@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Tetris!</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body class="disable-select">
 
+<div id="main-item">
   <div id="board-container">
-    <div id="main-container">
+    <div id="the-board">
       <div class="inputdiv">
         <div class="inputdiv2"></div>
         <div class="inputdiv2"></div>
@@ -250,7 +254,8 @@
         <div class="inputdiv2"></div>
         <div class="inputdiv2"></div>
       </div>
-    </div>  
+    </div>
+
     <div id="stats">
       <div id="the-score">SCORE: 0</div>
       <div id="the-level">LEVEL: 1</div>
@@ -279,32 +284,36 @@
       HIGH SCORES:<br>
     </div>
   </div>
-
-  <br>
+  
   <div id="controls-container">
-    <div id="controls">
+    <div id="button-container">
       <b>
       <table>
         <tr>
           <td></td>
-          <td><div class="button" id="w">&utrif;</div></td>
+          <td><div class="control button" id="w">&utrif;</div></td>
           <td></td>
           <td></td>
         </tr>
         <tr>
-          <td><div class="button" id="a">&ltrif;</div></td>
-          <td><div class="button" id="s">&dtrif;</div></td>
-          <td><div class="button" id="d">&rtrif;</div></td>
+          <td><div class="control button" id="a">&ltrif;</div></td>
+          <td><div class="control button" id="s">&dtrif;</div></td>
+          <td><div class="control button" id="d">&rtrif;</div></td>
           <td></td>
         </tr>
       </table>
       </b>
-      <br>
     </div>
-    <table>
-      <tr><td><button id="start-button">START</button></td></tr>
-      <tr><td><button id="pause-button">PAUSE</button></td></tr>
-    </table>
+    <div id="start-pause-buttons">
+      <button id="start-button" class="start button">START</button>
+      <br><br>
+      <button id="pause-button" class="pause button">PAUSE</button>
+    </div>
+  </div>
+
+</div>
+
+    
   </div>
   
   
