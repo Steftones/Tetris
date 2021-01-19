@@ -2,47 +2,61 @@ const theScore = document.getElementById('the-score')
 const theLevel = document.getElementById('the-level')
 const nextPiece = Array.from(document.getElementsByClassName('next-piece'))
 
-const sounds = {
-  collect: new Audio('sounds/collect.wav'),
-  line: new Audio('sounds/line.wav'),
-  end: new Audio('sounds/end.wav'),
-  m1: new Audio('sounds/1.wav'),
-  m2: new Audio('sounds/2.wav'),
-  m3: new Audio('sounds/3.wav'),
-  moveSound(){
-    const arr = [this.m1, this.m2, this.m3]
-    this.m1.currentTime = 0
-    this.m2.currentTime = 0
-    this.m3.currentTime = 0
-    arr[Math.floor(Math.random() * arr.length)].play()
-  }
-}
+document.getElementById('w').addEventListener('click', () => {
+  if (!gameState.isRunning) return
+  sounds.move.currentTime = 0
+  sounds.move.play()
+  if (pieces.currentPiece !== pieces.O) moveRotation()
+})
 
-function startGame(){
-  for (let i = 3; i < 23; i++){
-    for (let j = 3; j < 12; j++){
-      board[i][j] = 0
-    }
-  }
-  clearInterval(intervalId)
-  gameState.isRunning = true
-  sounds.end.play()
-  point.reset()
-  gameState.score = 0
-  gameState.level = 1
-  theScore.innerHTML = 'SCORE: 0'
-  theLevel.innerHTML = 'LEVEL: 1'
-  pieces.setCurrentPiece()
-  initializePiece(point.get())
-  timedEvent(gameState.levelSpeed)
-  drawBoard()
-}
+document.getElementById('a').addEventListener('click', () => {
+  if (!gameState.isRunning) return
+  sounds.move.currentTime = 0
+  sounds.move.play()
+  moveLeft()
+})
+
+document.getElementById('d').addEventListener('click', () => {
+  if (!gameState.isRunning) return
+  sounds.move.currentTime = 0
+  sounds.move.play()
+  moveRight()
+})
+
+document.getElementById('s').addEventListener('click', () => {
+  if (!gameState.isRunning) return
+  sounds.move.currentTime = 0
+  sounds.move.play()
+  moveDown()
+})
 
 const startButton = document.getElementById('start-button')
 startButton.addEventListener('click', () => {
-  startButton.innerHTML = 'RESTART' // only displays start when the game is over
+  startButton.innerHTML = 'RESTART'
+  pauseButton.innerHTML = 'PAUSE'
   startGame()
 })
+
+const pauseButton = document.getElementById('pause-button')
+pauseButton.addEventListener('click', () => {
+  gameState.isRunning = !gameState.isRunning
+  gameState.isRunning ? pauseButton.innerHTML = 'PAUSE' : pauseButton.innerHTML = 'RESUME'
+  if (!gameState.isRunning){
+    clearInterval(intervalId)
+  } else {
+    clearInterval(intervalId)
+    timedEvent(gameState.levelSpeed)
+  }
+})
+
+const sounds = {
+  collect: new Audio('sounds/collect.wav'),
+  line: new Audio('sounds/line.wav'),
+  start: new Audio('sounds/start.wav'),
+  end: new Audio('sounds/end.wav'),
+  move: new Audio('sounds/1.wav'),
+  select: new Audio('sounds/select.wav')
+}
 
 const gameState = {
   score: 0,
@@ -70,15 +84,38 @@ function timedEvent(time){
     drawBoard()
     for (let i = 3; i <= 12; i++){ // check, doesn't seem to work 100%
       if (board[3][i] === 1){
+        sounds.end.play()
         gameState.isRunning = false
         clearInterval(intervalId)
-        alert('Game over! You scored ' + gameState.score)
+        console.log('Game over! You scored ' + gameState.score)
         startButton.innerHTML = 'START'
         return
       }
     }
   }, time)
 }
+
+function startGame(){
+  for (let i = 3; i < 23; i++){ // doesn't work properly
+    for (let j = 3; j < 12; j++){
+      board[i][j] = 0
+    }
+  }
+  clearInterval(intervalId)
+  gameState.isRunning = true
+  sounds.start.play()
+  point.reset()
+  gameState.score = 0
+  gameState.level = 1
+  gameState.levelSpeed = 650
+  theScore.innerHTML = 'SCORE: 0'
+  theLevel.innerHTML = 'LEVEL: 1'
+  pieces.setCurrentPiece()
+  initializePiece(point.get())
+  timedEvent(gameState.levelSpeed)
+  drawBoard()
+}
+
 
 let board = [
   [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
@@ -91,7 +128,7 @@ let board = [
   [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
   [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
   [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], 
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], // 10
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
   [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
   [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
   [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
@@ -304,7 +341,8 @@ document.addEventListener('keydown', (e) => {
     }
   }
   if (!gameState.isRunning) return
-  sounds.moveSound()
+  sounds.move.currentTime = 0
+  sounds.move.play()
   if (e.key === 'w'){
     if (pieces.currentPiece !== pieces.O) moveRotation()
   } else if (e.key === 'a'){

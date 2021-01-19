@@ -11,17 +11,59 @@ body {
   color: black;
 }
 
+#board-container {
+  display: flex;
+  justify-content: center;
+}
+
 .inputdiv2 {
   width: 15px;
   height: 15px;
   display: inline-block;
 }
 
-.next-piece-items {
-  width: 15px;
-  height: 15px;
-  display: inline-block;
+.inputdiv2:active {
+  transform: translateY(2px);
 }
+
+.next-piece-items {
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+  margin: none;
+}
+
+.next-piece {
+  height: 10px;
+}
+
+#controls-container {
+  display: flex;
+  justify-content: center;
+}
+
+.button {
+  width: 30px;
+  height: 30px;
+  margin: 3px;
+  text-align: center;
+  display: inline-block;
+  background-color: #99d49b;
+  border: none;
+  border-radius: 100%;
+  -webkit-box-shadow: inset 0px -2px 5px #333;
+  -moz-box-shadow: inset 0px -2px 5px #333;
+  box-shadow: inset 0px -2px 5px #333;
+}
+
+.button:active {
+  background-color: #62c265;
+  box-shadow: 0 5px rgb(105, 104, 104);
+  -webkit-box-shadow: inset 0px 2px 5px #333;
+  -moz-box-shadow: inset 0px 2px 5px #333;
+  box-shadow: inset 0px 2px 5px #333;
+ }
+
 
 
  
