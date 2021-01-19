@@ -2,34 +2,6 @@ const theScore = document.getElementById('the-score')
 const theLevel = document.getElementById('the-level')
 const nextPiece = Array.from(document.getElementsByClassName('next-piece'))
 
-document.getElementById('w').addEventListener('click', () => {
-  if (!gameState.isRunning) return
-  sounds.move.currentTime = 0
-  sounds.move.play()
-  if (pieces.currentPiece !== pieces.O) moveRotation()
-})
-
-document.getElementById('a').addEventListener('click', () => {
-  if (!gameState.isRunning) return
-  sounds.move.currentTime = 0
-  sounds.move.play()
-  moveLeft()
-})
-
-document.getElementById('d').addEventListener('click', () => {
-  if (!gameState.isRunning) return
-  sounds.move.currentTime = 0
-  sounds.move.play()
-  moveRight()
-})
-
-document.getElementById('s').addEventListener('click', () => {
-  if (!gameState.isRunning) return
-  sounds.move.currentTime = 0
-  sounds.move.play()
-  moveDown()
-})
-
 const startButton = document.getElementById('start-button')
 startButton.addEventListener('click', () => {
   startButton.innerHTML = 'RESTART'
@@ -37,16 +9,9 @@ startButton.addEventListener('click', () => {
   startGame()
 })
 
-const pauseButton = document.getElementById('pause-button')
+const pauseButton = document.getElementById('pause-button') // bug - when the game finishes, need to turn off completely
 pauseButton.addEventListener('click', () => {
-  gameState.isRunning = !gameState.isRunning
-  gameState.isRunning ? pauseButton.innerHTML = 'PAUSE' : pauseButton.innerHTML = 'RESUME'
-  if (!gameState.isRunning){
-    clearInterval(intervalId)
-  } else {
-    clearInterval(intervalId)
-    timedEvent(gameState.levelSpeed)
-  }
+  keyHandler('p')
 })
 
 const sounds = {
@@ -63,6 +28,7 @@ const gameState = {
   level: 1,
   levelSpeed: 650,
   isRunning: false,
+  isPaused: true,
   scoreUp(){
     this.score++
     if (this.score % 10 === 0){
@@ -75,6 +41,50 @@ const gameState = {
     theLevel.innerHTML = `LEVEL: ${this.level}`
   }
 }
+
+function keyHandler(input){
+  if (input === 'p' && gameState.isRunning){
+    if (!gameState.isPaused){
+      clearInterval(intervalId)
+      pauseButton.innerHTML = 'RESUME'
+    } else {
+      clearInterval(intervalId)
+      timedEvent(gameState.levelSpeed)
+      pauseButton.innerHTML = 'PAUSE'
+    }
+    gameState.isPaused = !gameState.isPaused
+  }
+  if (gameState.isPaused || !gameState.isRunning) return
+  sounds.move.currentTime = 0
+  sounds.move.play()
+  if (input === 'w'){
+    if (pieces.currentPiece !== pieces.O) moveRotation()
+  } else if (input === 'a'){
+    moveLeft()
+  } else if (input === 'd'){
+    moveRight()
+  } else if (input === 's'){
+    moveDown()
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  const key = e.key
+  keyHandler(key)
+})
+
+document.getElementById('w').addEventListener('click', () => {
+  keyHandler('w')
+})
+document.getElementById('a').addEventListener('click', () => {
+  keyHandler('a')
+})
+document.getElementById('d').addEventListener('click', () => {
+  keyHandler('d')
+})
+document.getElementById('s').addEventListener('click', () => {
+  keyHandler('s')
+})
 
 let intervalId
 function timedEvent(time){
@@ -96,12 +106,13 @@ function timedEvent(time){
 }
 
 function startGame(){
-  for (let i = 3; i < 23; i++){ // doesn't work properly
-    for (let j = 3; j < 12; j++){
+  for (let i = 3; i < 23; i++){
+    for (let j = 3; j < 13; j++){
       board[i][j] = 0
     }
   }
   clearInterval(intervalId)
+  gameState.isPaused = false
   gameState.isRunning = true
   sounds.start.play()
   point.reset()
@@ -328,31 +339,6 @@ function moveRight(){
     drawBoard()
   }
 }
-
-// key handling
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'p'){ // bug - if you press after the game has finished, it increments the score
-    gameState.isRunning = !gameState.isRunning
-    if (!gameState.isRunning){
-      clearInterval(intervalId)
-    } else {
-      clearInterval(intervalId)
-      timedEvent(gameState.levelSpeed)
-    }
-  }
-  if (!gameState.isRunning) return
-  sounds.move.currentTime = 0
-  sounds.move.play()
-  if (e.key === 'w'){
-    if (pieces.currentPiece !== pieces.O) moveRotation()
-  } else if (e.key === 'a'){
-    moveLeft()
-  } else if (e.key === 'd'){
-    moveRight()
-  } else if (e.key === 's'){
-    moveDown()
-  }
-})
 
 function checkCollision(area){
   const indices = new Array

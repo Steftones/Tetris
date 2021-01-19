@@ -16,6 +16,10 @@ body {
   justify-content: center;
 }
 
+#board-container > div {
+  margin: 6px;
+}
+
 .inputdiv2 {
   width: 15px;
   height: 15px;
@@ -63,6 +67,7 @@ body {
   -moz-box-shadow: inset 0px 2px 5px #333;
   box-shadow: inset 0px 2px 5px #333;
  }
+
 
 
 
