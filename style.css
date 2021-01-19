@@ -31,15 +31,19 @@ body {
 
 #the-board {
   background-color: rgb(182, 214, 226);
-  padding: 3px;
+  padding: 0px 4px 8px 4px;
   -webkit-box-shadow: inset 0px 0px 5px rgb(107, 107, 107);
   -moz-box-shadow: inset 0px 0px 5px rgb(107, 107, 107);
   box-shadow: inset 0px 0px 5px rgb(107, 107, 107);
 }
 
+.inputdiv {
+  height: 12px;
+}
+
 .inputdiv2 {
-  width: 15px;
-  height: 15px;
+  width: 10px;
+  height: 10px;
   display: inline-block;
 }
 

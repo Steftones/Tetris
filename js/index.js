@@ -87,14 +87,22 @@ document.getElementById('s').addEventListener('click', () => {
 })
 
 function printHighScore(){
+  function parseDate(date){
+    const arr = date.split(" ")
+    const newDate = (new Array).concat(arr[1], arr[2], arr[3])
+    return newDate.join(" ")
+  }
   if (!localStorage) return
   const highScoresList = document.getElementById('high-score-list')
-  while (highScoresList.firstChild) highScoresList.removeChild(highScoresList.lastChild)
-  const arrayOfScores = Object.entries(localStorage).map(e => e).sort((a, b) => a - b).reverse()
+  while (highScoresList.firstChild){
+    highScoresList.removeChild(highScoresList.lastChild)
+  }
+  console.log(localStorage)
+  const arrayOfScores = Object.entries(localStorage).map(e => e).sort((a, b) => a[1] - b[1]).reverse()
   if (arrayOfScores.length > 5) arrayOfScores.length = 5
   for (let i = 0; i < arrayOfScores.length; i++){
     const li = document.createElement('li')
-    li.innerHTML = `${arrayOfScores[i][0]}: ${arrayOfScores[i][1]}`
+    li.innerHTML = `${parseDate(arrayOfScores[i][0])}: ${arrayOfScores[i][1]}`
     highScoresList.appendChild(li)
   }
 }
@@ -104,7 +112,7 @@ printHighScore()
 
 function setHighScore(){
   if (!localStorage) return
-  const date = new Date().toLocaleDateString()
+  const date = new Date()
   window.localStorage.setItem(date, gameState.score)
   printHighScore()
 }
@@ -117,10 +125,10 @@ function timedEvent(time){
     drawBoard()
     for (let i = 3; i <= 12; i++){ // check, doesn't seem to work 100%
       if (board[3][i] === 1){
+        setHighScore()
         sounds.end.play()
         gameState.isRunning = false
         clearInterval(intervalId)
-        setHighScore()
         startButton.innerHTML = 'START'
         return
       }
