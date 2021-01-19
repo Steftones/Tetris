@@ -97,7 +97,6 @@ function printHighScore(){
   while (highScoresList.firstChild){
     highScoresList.removeChild(highScoresList.lastChild)
   }
-  console.log(localStorage)
   const arrayOfScores = Object.entries(localStorage).map(e => e).sort((a, b) => a[1] - b[1]).reverse()
   if (arrayOfScores.length > 5) arrayOfScores.length = 5
   for (let i = 0; i < arrayOfScores.length; i++){
@@ -106,7 +105,6 @@ function printHighScore(){
     highScoresList.appendChild(li)
   }
 }
-
 // init
 printHighScore()
 
@@ -119,11 +117,9 @@ function setHighScore(){
 
 let intervalId
 function timedEvent(time){
-  console.log('timer started')
   intervalId = setInterval(() => {
     moveDown()
     drawBoard()
-    console.log(board[3])
     for (let i = 3; i <= 12; i++){
       if (board[4][i] === 1){
         setHighScore()
@@ -278,7 +274,6 @@ const point = {
     this.y = 3
   }
 }
-console.log(point.get())
 
 function initializePiece(location){
   const x = location[0]
@@ -326,7 +321,6 @@ function moveRotation(){
   if (checkCollision('rotation')){
     return
   } else {
-    console.log('piece rotated')
     clearBoard()
     rotatePiece()
     initializePiece(previousLocation)
@@ -385,7 +379,6 @@ function checkCollision(area){
     for (let i = 1; i <= (point.y + 1); i++){
       for (let j = 3; j <= 12; j++){
         if (board[i][j] === 1 && board[i - 1][j] === 8){
-          console.log('block below collision')
           fixAllBlocks() // changes 8 to 1
           pieces.setCurrentPiece() // loads new piece
           gameState.scoreUp()
@@ -399,7 +392,6 @@ function checkCollision(area){
       for (let j = 0; j < board[0].length; j++){
         if (board[i][j] === 8){
           if (board[i][j - 1] === 1){
-            console.log('left collision')
             return true
           }
         }
@@ -410,7 +402,6 @@ function checkCollision(area){
       for (let j = 0; j < board[0].length; j++){
         if (board[i][j] === 8){
           if (board[i][j + 1] === 1){
-            console.log('right collision')
             return true
           }
         }
@@ -461,7 +452,6 @@ function checkCollision(area){
     for (let i = 0; i < currentBoardSnapshot.length; i++){
       for (let j = 0; j < currentBoardSnapshot[0].length; j++){
         if (rotatedPiece[i][j] === 8 && onBoardNoPieces[i][j] === 1){
-          console.log('rotation collision detected')
           return true
         }
       }
