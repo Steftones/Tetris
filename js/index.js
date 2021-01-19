@@ -37,8 +37,8 @@ const gameState = {
       clearInterval(intervalId)
       timedEvent(this.levelSpeed)
     }
-    theScore.innerHTML = `SCORE: ${this.score}`
-    theLevel.innerHTML = `LEVEL: ${this.level}`
+    theScore.innerHTML = `Score: ${this.score}`
+    theLevel.innerHTML = `Level: ${this.level}`
   }
 }
 
@@ -86,6 +86,29 @@ document.getElementById('s').addEventListener('click', () => {
   keyHandler('s')
 })
 
+function printHighScore(){
+  if (!localStorage) return
+  const highScoresList = document.getElementById('high-score-list')
+  while (highScoresList.firstChild) highScoresList.removeChild(highScoresList.lastChild)
+  const arrayOfScores = Object.entries(localStorage).map(e => e).sort((a, b) => a - b).reverse()
+  if (arrayOfScores.length > 5) arrayOfScores.length = 5
+  for (let i = 0; i < arrayOfScores.length; i++){
+    const li = document.createElement('li')
+    li.innerHTML = `${arrayOfScores[i][0]}: ${arrayOfScores[i][1]}`
+    highScoresList.appendChild(li)
+  }
+}
+
+// init
+printHighScore()
+
+function setHighScore(){
+  if (!localStorage) return
+  const date = new Date().toLocaleDateString()
+  window.localStorage.setItem(date, gameState.score)
+  printHighScore()
+}
+
 let intervalId
 function timedEvent(time){
   console.log('timer started')
@@ -97,7 +120,7 @@ function timedEvent(time){
         sounds.end.play()
         gameState.isRunning = false
         clearInterval(intervalId)
-        console.log('Game over! You scored ' + gameState.score)
+        setHighScore()
         startButton.innerHTML = 'START'
         return
       }
@@ -119,8 +142,8 @@ function startGame(){
   gameState.score = 0
   gameState.level = 1
   gameState.levelSpeed = 650
-  theScore.innerHTML = 'SCORE: 0'
-  theLevel.innerHTML = 'LEVEL: 1'
+  theScore.innerHTML = 'Score: 0'
+  theLevel.innerHTML = 'Level: 1'
   pieces.setCurrentPiece()
   initializePiece(point.get())
   timedEvent(gameState.levelSpeed)
