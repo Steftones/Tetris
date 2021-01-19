@@ -9,7 +9,7 @@ startButton.addEventListener('click', () => {
   startGame()
 })
 
-const pauseButton = document.getElementById('pause-button') // bug - when the game finishes, need to turn off completely
+const pauseButton = document.getElementById('pause-button')
 pauseButton.addEventListener('click', () => {
   keyHandler('p')
 })

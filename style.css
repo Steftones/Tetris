@@ -83,21 +83,22 @@ body {
   margin: 20px;
 }
 
-.start, .pause {
-  padding: 0px;
-  margin: 0px;
+#start-button, #pause-button {
+  background-color: #d8a2d1;
   width: 60px;
   height: 30px;
   border-radius: 20px;
-  font-size: 10px;
+  font-size: 12px;
+  text-align: center;
+  display: table-cell; 
+  vertical-align: middle;
 }
 
 .control {
-  width: 30px;
-  height: 30px;
-  margin: 3px;
+  width: 40px;
+  height: 40px;
+  margin: -3px;
   text-align: center;
-  display: inline-block;
   background-color: #99d49b;
   border-radius: 100%;
 }
@@ -116,6 +117,8 @@ body {
   -moz-box-shadow: inset 0px 2px 5px #333;
   box-shadow: inset 0px 2px 5px #333;
  }
+
+
 
 
 
