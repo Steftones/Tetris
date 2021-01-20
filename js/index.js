@@ -23,7 +23,7 @@ const sounds = {
   move: new Audio('sounds/move.wav'),
   select: new Audio('sounds/select.wav'),
   muted: false,
-  player(input){
+  play(input){
     if (sounds.muted === true) return 
     switch (input){
       case 'collect':
@@ -85,14 +85,14 @@ function keyHandler(input){
     gameState.isPaused = !gameState.isPaused
   }
   if (gameState.isPaused || !gameState.isRunning) return
-  sounds.player('move')
-  if (input === 'w'){
+  sounds.play('move')
+  if (input === 'w' || input === 'ArrowUp'){
     if (pieces.currentPiece !== pieces.O) moveRotation()
-  } else if (input === 'a'){
+  } else if (input === 'a' || input === 'ArrowLeft'){
     moveLeft()
-  } else if (input === 'd'){
+  } else if (input === 'd' || input === 'ArrowRight'){
     moveRight()
-  } else if (input === 's'){
+  } else if (input === 's' || input === 'ArrowDown'){
     moveDown()
   }
 }
@@ -153,7 +153,7 @@ function timedEvent(time){
         musicPlayer.abruptMute()
         musicPlayer.isPlaying = false
         setHighScore()
-        sounds.player('end')
+        sounds.play('end')
         gameState.isRunning = false
         clearInterval(intervalId)
         startButton.innerHTML = 'START'
@@ -172,7 +172,7 @@ function startGame(){
   clearInterval(intervalId)
   gameState.isPaused = false
   gameState.isRunning = true
-  sounds.player('start')
+  sounds.play('start')
   point.reset()
   gameState.score = 0
   gameState.level = 1
@@ -263,7 +263,6 @@ const pieces = {
   drawNextPiece(){
     const nextPieceLetter = this.random[this.random.length - 1]
     const arr = this[`${nextPieceLetter}`]
-    // reset divs - make them all white
     nextPiece.forEach((e) => {
       Array.from(e.children).forEach(e => e.style.backgroundColor = '')
     })
@@ -312,9 +311,7 @@ function initializePiece(location){
   const rows = pieces.currentPiece.length - 1
   for (let i = rows, j = 0; (i >= 0) && (j <= rows); i--, j++){
     for (let k = 0; k < rows + 1; k++){
-      if (pieces.currentPiece[j][k] !== 0){
-        board[y - i][x + k] = pieces.currentPiece[j][k]
-      }
+      if (pieces.currentPiece[j][k] !== 0) board[y - i][x + k] = pieces.currentPiece[j][k]
     }
   }
 }
@@ -324,11 +321,7 @@ function clearBoard(){
   const newBoard = cleanBoard
   for (let i = 0; i < board.length; i++){
     for (let j = 0; j < board[0].length; j++){
-      if (board[i][j] === 8){
-        newBoard[i][j] = 0
-      } else {
-        newBoard[i][j] = board[i][j]
-      }
+      board[i][j] === 8 ? newBoard[i][j] = 0 : newBoard[i][j] = board[i][j]
     }
   }
   board = newBoard
@@ -415,7 +408,7 @@ function checkCollision(area){
             if (board[4][i] === 1) return
           }
           gameState.scoreUp()
-          sounds.player('collect')
+          sounds.play('collect')
           return true
         }
       }
@@ -423,21 +416,13 @@ function checkCollision(area){
   } else if (area === 'left') {
     for (let i = 0; i < board.length; i++){
       for (let j = 0; j < board[0].length; j++){
-        if (board[i][j] === 8){
-          if (board[i][j - 1] === 1){
-            return true
-          }
-        }
+        if (board[i][j] === 8 && board[i][j - 1] === 1) return true
       }
     }
   } else if (area === 'right') {
     for (let i = 0; i < board.length; i++){
       for (let j = 0; j < board[0].length; j++){
-        if (board[i][j] === 8){
-          if (board[i][j + 1] === 1){
-            return true
-          }
-        }
+        if (board[i][j] === 8 && board[i][j + 1] === 1) return true
       }
     }
   } else if (area === 'rotation'){
@@ -481,7 +466,6 @@ function checkCollision(area){
     rotatePiece()
 
     // compare if ROTATION SNAPSHOT(i) === 8 && NO PIECE SNAPSHOT(i) === 1 #=> collision true
-
     for (let i = 0; i < currentBoardSnapshot.length; i++){
       for (let j = 0; j < currentBoardSnapshot[0].length; j++){
         if (rotatedPiece[i][j] === 8 && onBoardNoPieces[i][j] === 1){
@@ -516,8 +500,7 @@ function checkLine(){
       gameState.scoreUp()
       clearBoard()
       drawBoard()
-      // sounds.line.currentTime = 0
-      sounds.player('line')
+      sounds.play('line')
     }
   }
 }
@@ -530,7 +513,7 @@ function drawBoard(){
       if (board[i][j] === 8 || board[i][j] === 1){
         divs[i - 3].children[j - 3].style.backgroundColor = 'black'
       } else if (board[i][j] === 0){
-        divs[i - 3].children[j - 3].style.backgroundColor = 'rgb(150, 150, 143)' // original: rgb(158, 241, 241), 'rgb(122, 122, 115)'
+        divs[i - 3].children[j - 3].style.backgroundColor = 'rgb(150, 150, 143)'
       } 
     }
   }

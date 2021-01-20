@@ -18,7 +18,7 @@ const musicPlayer = {
   }
 }
 
-Tone.Transport.bpm.value = 150;
+Tone.Transport.bpm.value = 150
 
 // init sounds
 let initMusic = false
@@ -81,15 +81,11 @@ const bassNotes = [
 
 let index = 0
 function repeat(time){
-  const position = index  % synthNotes.length
+  const position = index % synthNotes.length
   const synthNote = synthNotes[position]
   const bassNote = bassNotes[position]
-  if (synthNote !== ''){
-    synth.triggerAttackRelease(synthNote, '8n', time)
-  }
-  if (bassNote !== ''){
-    bassSynth.triggerAttackRelease(bassNote, '8n', time)
-  }
+  if (synthNote !== '') synth.triggerAttackRelease(synthNote, '8n', time)
+  if (bassNote !== '') bassSynth.triggerAttackRelease(bassNote, '8n', time)
   index ++
 }
 
@@ -98,19 +94,11 @@ Tone.Transport.scheduleRepeat((time) => {
 }, '8n')
 
 document.getElementById('sound-button').addEventListener('click', () => {
-  if (sounds.muted === false){
-    sounds.muted = true
-  } else {
-    sounds.muted = false
-  }
+  sounds.muted === false ? sounds.muted = true : sounds.muted = false
 })
 
 document.getElementById('music-button').addEventListener('click', () => {
-  if (musicPlayer.isPlaying){
-    musicPlayer.mute()
-  } else {
-    musicPlayer.play()
-  } 
+  musicPlayer.isPlaying ? musicPlayer.mute() : musicPlayer.play()
 })
 
 
