@@ -57,16 +57,6 @@ const synthNotes = [
   'G#4','','','','','','',''
 ]
 
-let synthIndex = 0
-function repeat(time){
-  const position = synthIndex  % synthNotes.length
-  const note = synthNotes[position]
-  if (note !== ''){
-    synth.triggerAttackRelease(note, '8n', time)
-  }
-  synthIndex ++
-}
-
 const bassNotes = [
   'E2','E3','E2','E3','E2','E3','E2','E3',
   'A2','A3','A2','A3','A2','A3','A2','A3',
@@ -89,19 +79,22 @@ const bassNotes = [
   'G#2','E2','G#2','E2','G#2','E2','G#2','E2'
 ]
 
-let bassIndex = 0
-function repeatBass(time){
-  const position = bassIndex % bassNotes.length
-  const note = bassNotes[position]
-  if (note !== ''){
-    bassSynth.triggerAttackRelease(note, '8n', time)
+let index = 0
+function repeat(time){
+  const position = index  % synthNotes.length
+  const synthNote = synthNotes[position]
+  const bassNote = bassNotes[position]
+  if (synthNote !== ''){
+    synth.triggerAttackRelease(synthNote, '8n', time)
   }
-  bassIndex++
+  if (bassNote !== ''){
+    bassSynth.triggerAttackRelease(bassNote, '8n', time)
+  }
+  index ++
 }
 
 Tone.Transport.scheduleRepeat((time) => { 
-  repeat(time) 
-  repeatBass(time) 
+  repeat(time)
 }, '8n')
 
 document.getElementById('sound-button').addEventListener('click', () => {
