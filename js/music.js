@@ -1,7 +1,5 @@
-// import * as Tone from 'tone'
-
 const musicPlayer = {
-  volume: - 13,
+  volume: - 17,
   isPlaying: false,
   abruptMute(){
     Tone.Master.mute = true
@@ -57,7 +55,6 @@ const synthNotes = [
   'D4','','','','B3','','','',
   'C4','','E4','','A4','','','',
   'G#4','','','','','','',''
-
 ]
 
 let synthIndex = 0
