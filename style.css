@@ -93,6 +93,16 @@ body {
   margin: 30px;
 }
 
+#sound-button {
+  position: fixed;
+  transform: translate(240px, -15px);
+}
+
+#music-button {
+  position: fixed;
+  transform: translate(220px, -15px);
+}
+
 #start-button, #pause-button {
   font-family: 'Roboto', sans-serif;
   background-color: #d8a2d1;
@@ -112,7 +122,6 @@ body {
   text-align: center;
   background-color: #d7da49;
   border-radius: 100%;
-  /* transform: translateY(-10px); */
 }
 
 .button {

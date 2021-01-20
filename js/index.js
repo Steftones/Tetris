@@ -7,6 +7,7 @@ startButton.addEventListener('click', () => {
   startButton.innerHTML = 'RESTART'
   pauseButton.innerHTML = 'PAUSE'
   startGame()
+  musicPlayer.play()
 })
 
 const pauseButton = document.getElementById('pause-button')
@@ -19,8 +20,37 @@ const sounds = {
   line: new Audio('sounds/line.wav'),
   start: new Audio('sounds/start.wav'),
   end: new Audio('sounds/end.wav'),
-  move: new Audio('sounds/1.wav'),
-  select: new Audio('sounds/select.wav')
+  move: new Audio('sounds/move.wav'),
+  select: new Audio('sounds/select.wav'),
+  muted: false,
+  player(input){
+    if (sounds.muted === true) return 
+    switch (input){
+      case 'collect':
+        this.collect.currentTime = 0
+        this.collect.play()
+        break
+      case 'line':
+        this.line.currentTime = 0
+        this.line.play()
+        break
+      case 'start':
+        this.start.currentTime = 0
+        this.start.play()
+        break
+      case 'end':
+        this.end.play()
+        break
+      case 'move':
+        this.move.currentTime = 0
+        this.move.play()
+        break
+      case 'select':
+        this.select.currentTime = 0
+        this.select.play()
+        break
+    }
+  }
 }
 
 const gameState = {
@@ -55,8 +85,7 @@ function keyHandler(input){
     gameState.isPaused = !gameState.isPaused
   }
   if (gameState.isPaused || !gameState.isRunning) return
-  sounds.move.currentTime = 0
-  sounds.move.play()
+  sounds.player('move')
   if (input === 'w'){
     if (pieces.currentPiece !== pieces.O) moveRotation()
   } else if (input === 'a'){
@@ -72,7 +101,6 @@ document.addEventListener('keydown', (e) => {
   const key = e.key
   keyHandler(key)
 })
-
 document.getElementById('w').addEventListener('click', () => {
   keyHandler('w')
 })
@@ -122,8 +150,10 @@ function timedEvent(time){
     drawBoard()
     for (let i = 3; i <= 12; i++){
       if (board[4][i] === 1){
+        musicPlayer.abruptMute()
+        musicPlayer.isPlaying = false
         setHighScore()
-        sounds.end.play()
+        sounds.player('end')
         gameState.isRunning = false
         clearInterval(intervalId)
         startButton.innerHTML = 'START'
@@ -142,7 +172,7 @@ function startGame(){
   clearInterval(intervalId)
   gameState.isPaused = false
   gameState.isRunning = true
-  sounds.start.play()
+  sounds.player('start')
   point.reset()
   gameState.score = 0
   gameState.level = 1
@@ -381,8 +411,11 @@ function checkCollision(area){
         if (board[i][j] === 1 && board[i - 1][j] === 8){
           fixAllBlocks() // changes 8 to 1
           pieces.setCurrentPiece() // loads new piece
+          for (let i = 3; i <= 12; i++){
+            if (board[4][i] === 1) return
+          }
           gameState.scoreUp()
-          sounds.collect.play()
+          sounds.player('collect')
           return true
         }
       }
@@ -484,7 +517,7 @@ function checkLine(){
       clearBoard()
       drawBoard()
       // sounds.line.currentTime = 0
-      sounds.line.play()
+      sounds.player('line')
     }
   }
 }
