@@ -1,3 +1,16 @@
+// creates html elements
+const theBoard = document.getElementById('the-board')
+for (let i = 0; i < 20; i++){
+  const inputdiv = document.createElement('div')
+  inputdiv.classList.add('inputdiv')
+  theBoard.appendChild(inputdiv)
+  for (let j = 0; j < 10; j++){
+    const inputdiv2 = document.createElement('div')
+    inputdiv2.classList.add('inputdiv2')
+    inputdiv.appendChild(inputdiv2)
+  }
+}
+
 const theScore = document.getElementById('the-score')
 const theLevel = document.getElementById('the-level')
 const nextPiece = Array.from(document.getElementsByClassName('next-piece'))

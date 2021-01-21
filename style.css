@@ -47,9 +47,13 @@ body {
 
 #the-board {
   padding: 0px;
+  margin-top: 10px;
 }
 
 .inputdiv {
+  display: flex;
+  justify-content: space-around;
+  min-width: 120px;
   height: 12px;
 }
 
