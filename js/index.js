@@ -344,8 +344,8 @@ function moveRotation(){
   if (checkCollision('rotation')){
     return
   } else {
-    clearBoard()
     rotatePiece()
+    clearBoard()
     initializePiece(previousLocation)
     drawBoard()
   }
@@ -430,21 +430,12 @@ function checkCollision(area){
     const x = point.x
     const y = point.y
 
-    let currentBoardSnapshot = []
-    // get an array of 3 * 3 or 4 * 4 from that point (BOARD SNAPSHOT)
-    if (pieces.currentPiece.length === 3){
-      currentBoardSnapshot = [
-        [board[y - 2][x], board[y - 2][x + 1], board[y - 2][x + 2]],
-        [board[y - 1][x], board[y - 1][x + 1], board[y - 1][x + 2]],
-        [board[y][x], board[y][x + 1], board[y][x + 2]]
-      ]
-    } else {
-      currentBoardSnapshot = [
-        [board[y - 3][x], board[y - 3][x + 1], board[y - 3][x + 2], board[y - 3][x + 3]],
-        [board[y - 2][x], board[y - 2][x + 1], board[y - 2][x + 2], board[y - 2][x + 3]],
-        [board[y - 1][x], board[y - 1][x + 1], board[y - 1][x + 2], board[y - 1][x + 3]],
-        [board[y][x], board[y][x + 1], board[y][x + 2], board[y][x + 3]]
-      ]
+    const currentBoardSnapshot = [[],[],[]]
+    if (pieces.currentPiece.length === 4) currentBoardSnapshot.push([])
+    for (let i = pieces.currentPiece.length - 1, j = 0; i > 0, j < pieces.currentPiece.length; i--, j++){
+      for (let k = 0; k < pieces.currentPiece.length; k++){
+        currentBoardSnapshot[j].push(board[y - i][x + k])
+      }
     }
 
     // get an array of on board with no pieces (BOARD NO PIECE SNAPSHOT) 
