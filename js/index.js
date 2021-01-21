@@ -281,7 +281,7 @@ const pieces = {
     })
     for (let i = 1; i < arr.length; i++){
       for (let j = 0; j < arr[0].length; j++){
-        if (arr[i][j] === 8) nextPiece[i].children[j].style.backgroundColor = 'black'
+        if (arr[i][j] === 8) nextPiece[i].children[j].style.backgroundColor = 'rgb(56, 56, 56)'
       }
     }
   },
@@ -515,7 +515,7 @@ function drawBoard(){
   for (let i = 3; i < board.length - 3; i++){
     for (let j = 3; j <= 12; j++){
       if (board[i][j] === 8 || board[i][j] === 1){
-        divs[i - 3].children[j - 3].style.backgroundColor = 'black'
+        divs[i - 3].children[j - 3].style.backgroundColor = 'rgb(56, 56, 56)'
       } else if (board[i][j] === 0){
         divs[i - 3].children[j - 3].style.backgroundColor = 'rgb(150, 150, 143)'
       } 
