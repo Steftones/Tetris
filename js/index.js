@@ -1,32 +1,65 @@
-// creates html elements
-const theBoard = document.getElementById('the-board')
-for (let i = 0; i < 20; i++){
-  const inputdiv = document.createElement('div')
-  inputdiv.classList.add('inputdiv')
-  theBoard.appendChild(inputdiv)
-  for (let j = 0; j < 10; j++){
-    const inputdiv2 = document.createElement('div')
-    inputdiv2.classList.add('inputdiv2')
-    inputdiv.appendChild(inputdiv2)
-  }
-}
+// ************ Variables and game state **************
 
+// DOM elements
+const theBoard = document.getElementById('the-board')
 const theScore = document.getElementById('the-score')
 const theLevel = document.getElementById('the-level')
 const nextPiece = Array.from(document.getElementsByClassName('next-piece'))
-
 const startButton = document.getElementById('start-button')
+const pauseButton = document.getElementById('pause-button')
+const divs = document.getElementsByClassName('inputdiv')
+document.addEventListener('keydown', (e) => keyHandler(e.key))
+document.getElementById('w').addEventListener('click', () => keyHandler('w'))
+document.getElementById('a').addEventListener('click', () => keyHandler('a'))
+document.getElementById('d').addEventListener('click', () => keyHandler('d'))
+document.getElementById('s').addEventListener('click', () => keyHandler('s'))
+
 startButton.addEventListener('click', () => {
   startButton.innerHTML = 'RESTART'
   pauseButton.innerHTML = 'PAUSE'
   startGame()
   musicPlayer.play()
 })
-
-const pauseButton = document.getElementById('pause-button')
 pauseButton.addEventListener('click', () => {
   keyHandler('p')
 })
+
+// variables and game objects
+let board = [
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], 
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+]
+const cleanBoard = board
+
+const gameState = {
+  score: 0,
+  level: 1,
+  levelSpeed: 650,
+  isRunning: false,
+  isPaused: true,
+  scoreUp(){
+    this.score++
+    if (this.score % 10 === 0){
+      this.level++
+      if (this.levelSpeed >= 50) this.levelSpeed -= 50
+      clearInterval(intervalId)
+      timedEvent(this.levelSpeed)
+    }
+    theScore.innerHTML = `Score: ${this.score}`
+    theLevel.innerHTML = `Level: ${this.level}`
+  }
+}
 
 const sounds = {
   collect: new Audio('sounds/collect.wav'),
@@ -66,25 +99,64 @@ const sounds = {
   }
 }
 
-const gameState = {
-  score: 0,
-  level: 1,
-  levelSpeed: 650,
-  isRunning: false,
-  isPaused: true,
-  scoreUp(){
-    this.score++
-    if (this.score % 10 === 0){
-      this.level++
-      if (this.levelSpeed >= 50) this.levelSpeed -= 50
-      clearInterval(intervalId)
-      timedEvent(this.levelSpeed)
-    }
-    theScore.innerHTML = `Score: ${this.score}`
-    theLevel.innerHTML = `Level: ${this.level}`
+const point = {
+  x: 6,
+  y: 3,
+  get(){
+    return [this.x, this.y]
+  },
+  set(arr){
+    this.x = arr[0]
+    this.y = arr[1]
+  },
+  reset(){
+    this.x = 6
+    this.y = 3
   }
 }
 
+const pieces = {
+  currentPiece: [],
+  J: [[0,0,0],[8,0,0],[8,8,8]],
+  L: [[0,0,0],[0,0,8],[8,8,8]],
+  T: [[0,0,0],[0,8,0],[8,8,8]],
+  Z: [[0,0,0],[8,8,0],[0,8,8]],
+  S: [[0,0,0],[0,8,8],[8,8,0]],
+  O: [[0,0,0],[8,8,0],[8,8,0]],
+  I: [[0,0,0,0],[8,8,8,8],[0,0,0,0],[0,0,0,0]],
+  random: [],
+  randomPieces(){
+    const arr = ['J', 'L', 'T', 'Z', 'S', 'O', 'I'].sort(() => Math.random() - 0.5)
+    return arr
+  },
+  drawNextPiece(){
+    const nextPieceLetter = this.random[this.random.length - 1]
+    const arr = this[`${nextPieceLetter}`]
+    nextPiece.forEach((e) => {
+      Array.from(e.children).forEach(e => e.style.backgroundColor = '')
+    })
+    for (let i = 1; i < arr.length; i++){
+      for (let j = 0; j < arr[0].length; j++){
+        if (arr[i][j] === 8) nextPiece[i].children[j].style.backgroundColor = 'rgb(56, 56, 56)'
+      }
+    }
+  },
+  setCurrentPiece(){
+    if (this.random.length === 0) this.random = this.randomPieces()
+    const piece = this.random.pop()
+    this.currentPiece = this[`${piece}`]
+    clearBoard()
+    drawBoard()
+    initializePiece(point.get())
+    this.drawNextPiece()
+    if (this.random.length === 1){
+      const concatArr = this.randomPieces()
+      this.random = concatArr.concat(this.random)
+    }
+  }
+}
+
+// ************ Game functionality **************
 function keyHandler(input){
   if (input === 'p' && gameState.isRunning){
     if (!gameState.isPaused){
@@ -110,23 +182,6 @@ function keyHandler(input){
   }
 }
 
-document.addEventListener('keydown', (e) => {
-  const key = e.key
-  keyHandler(key)
-})
-document.getElementById('w').addEventListener('click', () => {
-  keyHandler('w')
-})
-document.getElementById('a').addEventListener('click', () => {
-  keyHandler('a')
-})
-document.getElementById('d').addEventListener('click', () => {
-  keyHandler('d')
-})
-document.getElementById('s').addEventListener('click', () => {
-  keyHandler('s')
-})
-
 function printHighScore(){
   function parseDate(date){
     const arr = date.split(" ")
@@ -146,8 +201,6 @@ function printHighScore(){
     highScoresList.appendChild(li)
   }
 }
-// init
-printHighScore()
 
 function setHighScore(){
   if (!localStorage) return
@@ -198,125 +251,6 @@ function startGame(){
   drawBoard()
 }
 
-
-let board = [
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], 
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], 
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], // 3 lines of random mess need to be created
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], // 3 lines of random mess need to be created
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1], // 3 lines of random mess need to be created
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-]
-
-const cleanBoard = board
-
-const pieces = {
-  currentPiece: [],
-  J: [
-    [0,0,0],
-    [8,0,0],
-    [8,8,8]
-  ],
-  L: [
-    [0,0,0],
-    [0,0,8],
-    [8,8,8]
-  ],
-  T: [
-    [0,0,0],
-    [0,8,0],
-    [8,8,8]
-  ],
-  Z: [
-    [0,0,0],
-    [8,8,0],
-    [0,8,8]
-  ],
-  S: [
-    [0,0,0],
-    [0,8,8],
-    [8,8,0]
-  ],
-  O: [
-    [0,0,0],
-    [8,8,0],
-    [8,8,0]
-  ],
-  I: [
-    [0,0,0,0],
-    [8,8,8,8],
-    [0,0,0,0],
-    [0,0,0,0]
-  ],
-  random: [],
-  randomPieces(){
-    const arr = ['J', 'L', 'T', 'Z', 'S', 'O', 'I'].sort(() => Math.random() - 0.5)
-    return arr
-  },
-  drawNextPiece(){
-    const nextPieceLetter = this.random[this.random.length - 1]
-    const arr = this[`${nextPieceLetter}`]
-    nextPiece.forEach((e) => {
-      Array.from(e.children).forEach(e => e.style.backgroundColor = '')
-    })
-    for (let i = 1; i < arr.length; i++){
-      for (let j = 0; j < arr[0].length; j++){
-        if (arr[i][j] === 8) nextPiece[i].children[j].style.backgroundColor = 'rgb(56, 56, 56)'
-      }
-    }
-  },
-  setCurrentPiece(){
-    if (this.random.length === 0) this.random = this.randomPieces()
-    const piece = this.random.pop()
-    this.currentPiece = this[`${piece}`]
-    clearBoard()
-    drawBoard()
-    initializePiece(point.get())
-    // nextPiece.innerHTML = this.random[this.random.length - 1]
-    this.drawNextPiece()
-    if (this.random.length === 1){
-      const concatArr = this.randomPieces()
-      this.random = concatArr.concat(this.random)
-    }
-  }
-}
-
-const point = {
-  x: 6,
-  y: 3,
-  get(){
-    return [this.x, this.y]
-  },
-  set(arr){
-    this.x = arr[0]
-    this.y = arr[1]
-  },
-  reset(){
-    this.x = 6
-    this.y = 3
-  }
-}
-
 function initializePiece(location){
   const x = location[0]
   const y = location[1]
@@ -329,7 +263,7 @@ function initializePiece(location){
   }
 }
 
-// removes everything other than 1s
+// removes everything from the board other than the static pieces
 function clearBoard(){
   const newBoard = cleanBoard
   for (let i = 0; i < board.length; i++){
@@ -340,6 +274,7 @@ function clearBoard(){
   board = newBoard
 }
 
+// raw piece rotation calculation
 function rotatePiece(){
   const newPiece = [[],[],[]]
   if (pieces.currentPiece.length === 4) newPiece.push([]) 
@@ -352,6 +287,7 @@ function rotatePiece(){
   return pieces.currentPiece = newPiece
 }
 
+// player movement
 function moveRotation(){
   const previousLocation = point.get()
   if (checkCollision('rotation')){
@@ -402,6 +338,7 @@ function moveRight(){
   }
 }
 
+// collision detection
 function checkCollision(area){
   const indices = new Array
   if (area === 'floor' || area === 'top'){
@@ -415,8 +352,8 @@ function checkCollision(area){
     for (let i = 1; i <= (point.y + 1); i++){
       for (let j = 3; j <= 12; j++){
         if (board[i][j] === 1 && board[i - 1][j] === 8){
-          fixAllBlocks() // changes 8 to 1
-          pieces.setCurrentPiece() // loads new piece
+          fixAllBlocks()
+          pieces.setCurrentPiece()
           for (let i = 3; i <= 12; i++){
             if (board[4][i] === 1) return
           }
@@ -439,10 +376,11 @@ function checkCollision(area){
       }
     }
   } else if (area === 'rotation'){
-    // get current coordinates
+    // gets current coordinates
     const x = point.x
     const y = point.y
 
+    // gets an array of the tetromino and the pieces in the area around it
     const currentBoardSnapshot = [[],[],[]]
     if (pieces.currentPiece.length === 4) currentBoardSnapshot.push([])
     for (let i = pieces.currentPiece.length - 1, j = 0; i > 0, j < pieces.currentPiece.length; i--, j++){
@@ -451,7 +389,7 @@ function checkCollision(area){
       }
     }
 
-    // get an array of on board with no pieces (BOARD NO PIECE SNAPSHOT) 
+    // gets the area above but without the tetromino
     const onBoardNoPieces = currentBoardSnapshot.map(e => {
       return e.map(element => {
         if (element === 8){
@@ -462,14 +400,14 @@ function checkCollision(area){
       })
     })
 
-    // get an array of current piece rotated (ROTATION SNAPSHOT)
+    // get an array of the current piece rotated
     rotatePiece()
     const rotatedPiece = pieces.currentPiece
     rotatePiece() // reset the rotation
     rotatePiece()
     rotatePiece()
 
-    // compare if ROTATION SNAPSHOT(i) === 8 && NO PIECE SNAPSHOT(i) === 1 #=> collision true
+    // checks if rotated tetromino pieces overlap with static pieces on the board
     for (let i = 0; i < currentBoardSnapshot.length; i++){
       for (let j = 0; j < currentBoardSnapshot[0].length; j++){
         if (rotatedPiece[i][j] === 8 && onBoardNoPieces[i][j] === 1){
@@ -481,6 +419,7 @@ function checkCollision(area){
   }
 }
 
+// converts any tetromino pieces to static blocks
 function fixAllBlocks(){
   for (let i = 0; i < board.length; i++){
     for (let j = 0; j < board[0].length; j++){
@@ -496,6 +435,8 @@ function fixAllBlocks(){
   drawBoard()
 }
 
+// checks to see if a line has been filled with blocks across the game screen
+// removes the line and inserts a blank one above
 function checkLine(){
   for (let i = 3; i < 23; i++){
     if (board[i].every(e => e === 1 )){
@@ -509,8 +450,7 @@ function checkLine(){
   }
 }
 
-
-const divs = document.getElementsByClassName('inputdiv')
+// draws the board
 function drawBoard(){
   for (let i = 3; i < board.length - 3; i++){
     for (let j = 3; j <= 12; j++){
@@ -523,6 +463,19 @@ function drawBoard(){
   }
 }
 
-// init board
+// creates html elements
+for (let i = 0; i < 20; i++){
+  const inputdiv = document.createElement('div')
+  inputdiv.classList.add('inputdiv')
+  theBoard.appendChild(inputdiv)
+  for (let j = 0; j < 10; j++){
+    const inputdiv2 = document.createElement('div')
+    inputdiv2.classList.add('inputdiv2')
+    inputdiv.appendChild(inputdiv2)
+  }
+}
+
+// init board and high scores
+printHighScore()
 drawBoard()
 

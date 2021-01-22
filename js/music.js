@@ -1,3 +1,13 @@
+// DOM elements
+document.getElementById('sound-button').addEventListener('click', () => {
+  sounds.muted === false ? sounds.muted = true : sounds.muted = false
+})
+
+document.getElementById('music-button').addEventListener('click', () => {
+  musicPlayer.isPlaying ? musicPlayer.mute() : musicPlayer.play()
+})
+
+// music state object
 const musicPlayer = {
   volume: - 17,
   isPlaying: false,
@@ -18,23 +28,16 @@ const musicPlayer = {
   }
 }
 
+// sets the BPM
 Tone.Transport.bpm.value = 150
 
-// init sounds
-let initMusic = false
-window.addEventListener('click', () => {
-  if (!initMusic ){
-    musicPlayer.play()
-    initMusic = true
-  }
-})
-
+// creates instruments
 const synth = new Tone.Synth({ volume: musicPlayer.volume }).toDestination()
 synth.oscillator.type = 'square'
-
 const bassSynth = new Tone.Synth({ volume: musicPlayer.volume }).toDestination()
 bassSynth.oscillator.type = 'square'
 
+// musical sequence
 const synthNotes = [
   'E5','','B4','C5','D5','','C5','B4',
   'A4','','A4','C5','E5','','D5','C5',
@@ -79,6 +82,7 @@ const bassNotes = [
   'G#2','E2','G#2','E2','G#2','E2','G#2','E2'
 ]
 
+// loops the musical sequence
 let index = 0
 function repeat(time){
   const position = index % synthNotes.length
@@ -93,14 +97,14 @@ Tone.Transport.scheduleRepeat((time) => {
   repeat(time)
 }, '8n')
 
-document.getElementById('sound-button').addEventListener('click', () => {
-  sounds.muted === false ? sounds.muted = true : sounds.muted = false
+// init sounds
+let initMusic = false
+window.addEventListener('click', () => {
+  if (!initMusic ){
+    musicPlayer.play()
+    initMusic = true
+  }
 })
-
-document.getElementById('music-button').addEventListener('click', () => {
-  musicPlayer.isPlaying ? musicPlayer.mute() : musicPlayer.play()
-})
-
 
 
 
