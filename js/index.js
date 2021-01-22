@@ -291,42 +291,30 @@ function movementHelper(location){
 
 function moveRotation(){
   const previousLocation = point.get()
-  if (checkCollision('rotation')){
-    return
-  } else {
-    rotatePiece()
-    movementHelper(previousLocation)
-  }
+  if (checkCollision('rotation')) return
+  rotatePiece()
+  movementHelper(previousLocation)
 }
 
 function moveDown(){
-  if (checkCollision('block')){
-    return
-  } else {
-    const newLocation = [point.x, (point.y + 1)]
-    point.set(newLocation)
-    movementHelper(newLocation)
-  }
+  if (checkCollision('block')) return
+  const newLocation = [point.x, (point.y + 1)]
+  point.set(newLocation)
+  movementHelper(newLocation)
 }
 
 function moveLeft(){
-  if (checkCollision('left')){
-    return
-  } else {
-    const newLocation = [(point.x - 1), point.y]
-    point.set(newLocation)
-    movementHelper(newLocation)
-  }
+  if (checkCollision('left')) return
+  const newLocation = [(point.x - 1), point.y]
+  point.set(newLocation)
+  movementHelper(newLocation)
 }
 
 function moveRight(){
-  if (checkCollision('right')){
-    return
-  } else {
-    const newLocation = [(point.x + 1), point.y]
-    point.set(newLocation)
-    movementHelper(newLocation)
-  }
+  if (checkCollision('right')) return
+  const newLocation = [(point.x + 1), point.y]
+  point.set(newLocation)
+  movementHelper(newLocation)
 }
 
 // collision detection
@@ -334,9 +322,7 @@ function checkCollision(area){
   const indices = new Array
   if (area === 'floor' || area === 'top'){
     area === 'floor' ? indices.push(23,25) : indices.push(0,2)
-    for (let i = indices[0]; i <= indices[1]; i++){
-      if (board[i].includes(8)) return true 
-    }
+    for (let i = indices[0]; i <= indices[1]; i++) if (board[i].includes(8)) return true 
   } else if (area === 'block') {
     for (let i = 1; i <= (point.y + 1); i++){
       for (let j = 3; j <= 12; j++){
@@ -378,13 +364,7 @@ function checkCollision(area){
 
     // stores the array above but without the tetromino
     const onBoardNoPieces = currentBoardSnapshot.map(e => {
-      return e.map(element => {
-        if (element === 8){
-          return 0
-        } else {
-          return element
-        }
-      })
+      return e.map(e => (e === 8) ? 0 : e )
     })
 
     // stores an array of the current piece rotated
