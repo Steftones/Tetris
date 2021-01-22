@@ -184,9 +184,9 @@ function keyHandler(input){
 
 function printHighScore(){
   function parseDate(date){
-    const arr = date.split(" ")
+    const arr = date.split(' ')
     const newDate = (new Array).concat(arr[1], arr[2], arr[3])
-    return newDate.join(" ")
+    return newDate.join(' ')
   }
   if (!localStorage) return
   const highScoresList = document.getElementById('high-score-list')
@@ -230,11 +230,7 @@ function timedEvent(time){
 }
 
 function startGame(){
-  for (let i = 3; i < 23; i++){
-    for (let j = 3; j < 13; j++){
-      board[i][j] = 0
-    }
-  }
+  for (let i = 3; i < 23; i++) for (let j = 3; j < 13; j++) board[i][j] = 0
   clearInterval(intervalId)
   gameState.isPaused = false
   gameState.isRunning = true
@@ -254,7 +250,6 @@ function startGame(){
 function initializePiece(location){
   const x = location[0]
   const y = location[1]
-  
   const rows = pieces.currentPiece.length - 1
   for (let i = rows, j = 0; (i >= 0) && (j <= rows); i--, j++){
     for (let k = 0; k < rows + 1; k++){
@@ -288,15 +283,19 @@ function rotatePiece(){
 }
 
 // player movement
+function movementHelper(location){
+  clearBoard()
+  initializePiece(location)
+  drawBoard()
+}
+
 function moveRotation(){
   const previousLocation = point.get()
   if (checkCollision('rotation')){
     return
   } else {
     rotatePiece()
-    clearBoard()
-    initializePiece(previousLocation)
-    drawBoard()
+    movementHelper(previousLocation)
   }
 }
 
@@ -306,9 +305,7 @@ function moveDown(){
   } else {
     const newLocation = [point.x, (point.y + 1)]
     point.set(newLocation)
-    clearBoard()
-    initializePiece(newLocation)
-    drawBoard()
+    movementHelper(newLocation)
   }
 }
 
@@ -317,11 +314,8 @@ function moveLeft(){
     return
   } else {
     const newLocation = [(point.x - 1), point.y]
-    initializePiece(newLocation)
     point.set(newLocation)
-    clearBoard()
-    initializePiece(newLocation)
-    drawBoard()
+    movementHelper(newLocation)
   }
 }
 
@@ -330,11 +324,8 @@ function moveRight(){
     return
   } else {
     const newLocation = [(point.x + 1), point.y]
-    initializePiece(newLocation)
     point.set(newLocation)
-    clearBoard()
-    initializePiece(newLocation)
-    drawBoard()
+    movementHelper(newLocation)
   }
 }
 
@@ -344,9 +335,7 @@ function checkCollision(area){
   if (area === 'floor' || area === 'top'){
     area === 'floor' ? indices.push(23,25) : indices.push(0,2)
     for (let i = indices[0]; i <= indices[1]; i++){
-      if (board[i].includes(8)){ 
-        return true 
-      }
+      if (board[i].includes(8)) return true 
     }
   } else if (area === 'block') {
     for (let i = 1; i <= (point.y + 1); i++){
@@ -354,9 +343,7 @@ function checkCollision(area){
         if (board[i][j] === 1 && board[i - 1][j] === 8){
           fixAllBlocks()
           pieces.setCurrentPiece()
-          for (let i = 3; i <= 12; i++){
-            if (board[4][i] === 1) return
-          }
+          for (let i = 3; i <= 12; i++) if (board[4][i] === 1) return
           gameState.scoreUp()
           sounds.play('collect')
           return true
@@ -376,11 +363,11 @@ function checkCollision(area){
       }
     }
   } else if (area === 'rotation'){
-    // gets current coordinates
+    // stores current coordinates
     const x = point.x
     const y = point.y
 
-    // gets an array of the tetromino and the pieces in the area around it
+    // stores an array of the tetromino and the pieces in the area around it
     const currentBoardSnapshot = [[],[],[]]
     if (pieces.currentPiece.length === 4) currentBoardSnapshot.push([])
     for (let i = pieces.currentPiece.length - 1, j = 0; i > 0, j < pieces.currentPiece.length; i--, j++){
@@ -389,7 +376,7 @@ function checkCollision(area){
       }
     }
 
-    // gets the area above but without the tetromino
+    // stores the array above but without the tetromino
     const onBoardNoPieces = currentBoardSnapshot.map(e => {
       return e.map(element => {
         if (element === 8){
@@ -400,39 +387,33 @@ function checkCollision(area){
       })
     })
 
-    // get an array of the current piece rotated
+    // stores an array of the current piece rotated
     rotatePiece()
     const rotatedPiece = pieces.currentPiece
     rotatePiece() // reset the rotation
     rotatePiece()
     rotatePiece()
 
-    // checks if rotated tetromino pieces overlap with static pieces on the board
+    // compares arrays to see if rotated tetromino pieces overlap with static pieces on the board
     for (let i = 0; i < currentBoardSnapshot.length; i++){
       for (let j = 0; j < currentBoardSnapshot[0].length; j++){
-        if (rotatedPiece[i][j] === 8 && onBoardNoPieces[i][j] === 1){
-          return true
-        }
+        if (rotatedPiece[i][j] === 8 && onBoardNoPieces[i][j] === 1) return true
       }
     }
 
   }
 }
 
-// converts any tetromino pieces to static blocks
+// converts current tetromino pieces to static blocks
 function fixAllBlocks(){
   for (let i = 0; i < board.length; i++){
     for (let j = 0; j < board[0].length; j++){
-      if (board[i][j] === 8){
-        board[i][j] = 1
-      }
+      if (board[i][j] === 8) board[i][j] = 1
     }
   }
   checkLine()
-  clearBoard()
   point.reset()
-  initializePiece(point.get())
-  drawBoard()
+  movementHelper(point.get())
 }
 
 // checks to see if a line has been filled with blocks across the game screen
